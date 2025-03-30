@@ -8,14 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+
+    var predators = Predators()
+
+    var filteredPredators: [ApexPredator] {
+        if searchText.isEmpty {
+            return predators.apexPredators
+        } else {
+            return predators.apexPredators.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText)
+            }
         }
-        .padding()
+    }
+
+    @State var searchText: String = ""
+    var body: some View {
+        NavigationStack {
+            List(filteredPredators) { predators in
+                NavigationLink{
+
+                } label: {
+                    PredatorCardView(predator: predators)
+                }
+            }
+            .navigationTitle("Apex Predators")
+            .searchable(text: $searchText)
+            .autocorrectionDisabled()
+            .animation(.easeIn, value: searchText)
+        }
+        .preferredColorScheme(.dark)
     }
 }
 
