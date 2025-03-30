@@ -11,17 +11,19 @@ struct ContentView: View {
 
     var predators = Predators()
 
+    @State var searchText: String = ""
+    @State var isAlphabeticalSorted: Bool = false
+    @State var currentFilterType: APType = .all
+
     var filteredPredators: [ApexPredator] {
-        if searchText.isEmpty {
-            return predators.apexPredators
-        } else {
-            return predators.apexPredators.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText)
-            }
-        }
+
+        predators.filter(by: currentFilterType)
+
+        predators.sort(by: isAlphabeticalSorted)
+
+        return predators.search(for: searchText)
     }
 
-    @State var searchText: String = ""
     var body: some View {
         NavigationStack {
             List(filteredPredators) { predators in
@@ -35,6 +37,33 @@ struct ContentView: View {
             .searchable(text: $searchText)
             .autocorrectionDisabled()
             .animation(.easeIn, value: searchText)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        withAnimation {
+                            isAlphabeticalSorted.toggle()
+                        }
+                    } label: {
+                        Image(systemName: isAlphabeticalSorted ? "film" : "textformat")
+                            .symbolEffect(.bounce, value: isAlphabeticalSorted)
+                    }
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Picker("Filter", selection: $currentFilterType) {
+                            ForEach (APType.allCases) { type in
+                                Label(type.rawValue.capitalized, systemImage: type.icon)
+                                    .onTapGesture {
+                                        currentFilterType = type
+                                    }
+                            }
+                        }
+                    } label : {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                }
+            }
         }
         .preferredColorScheme(.dark)
     }
