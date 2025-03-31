@@ -26,11 +26,11 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            List(filteredPredators) { predators in
+            List(filteredPredators) { predator in
                 NavigationLink{
-
+                    PredatorDetail(predator: predator)
                 } label: {
-                    PredatorCardView(predator: predators)
+                    PredatorCardView(predator: predator)
                 }
             }
             .navigationTitle("Apex Predators")
